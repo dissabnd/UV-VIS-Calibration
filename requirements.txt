@@ -2,5 +2,9 @@ streamlit>=1.31
 pandas>=2.0
 numpy>=1.24
 matplotlib>=3.7
-# optional: reading standard GRAMS/Galactic .spc files
-spc-spectra>=0.4
+
+# Optional - only needed to read standard GRAMS/Galactic .spc files.
+# Shimadzu .spc files (what this app is built for) do NOT need it.
+# Its setup.py imports numpy, so it fails inside pip's isolated build env;
+# install it separately with:
+#     pip install --no-build-isolation spc-spectra

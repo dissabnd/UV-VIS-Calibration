@@ -24,6 +24,20 @@ pip install -r requirements.txt
 
 Python 3.9+.
 
+**Optional — GRAMS/Galactic `.spc` files.** Shimadzu files (what this app is
+built for) are read by the bundled reader and need nothing extra. Only if you
+also have standard GRAMS `.spc` files:
+
+```bash
+pip install --no-build-isolation spc-spectra
+```
+
+The `--no-build-isolation` flag is required: `spc-spectra`'s `setup.py` imports
+the package, which imports numpy, so a plain `pip install spc-spectra` fails
+with *"Failed to build spc-spectra"* / `ModuleNotFoundError: No module named
+'numpy'` inside pip's isolated build environment. This is why it is not in
+`requirements.txt`.
+
 ## Run
 
 ```bash

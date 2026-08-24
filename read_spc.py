@@ -65,7 +65,8 @@ def read_grams_spc(path):
         except ImportError:
             raise RuntimeError(
                 "Not a Shimadzu .spc and the GRAMS reader isn't installed.\n"
-                "Try: pip install spc-spectra"
+                "Try: pip install --no-build-isolation spc-spectra\n"
+                "(--no-build-isolation is required: its setup.py imports numpy)"
             )
     f = spc.File(path)
     sub = f.sub[0]
