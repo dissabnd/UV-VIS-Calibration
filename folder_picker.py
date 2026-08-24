@@ -238,6 +238,9 @@ def dialog_backend():
         return "osascript"
     if sys.platform == "win32" and (shutil.which("powershell") or shutil.which("pwsh")):
         return "powershell"
+    has_display = bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
+    if sys.platform not in ("darwin", "win32") and not has_display:
+        return None          # headless server: no dialog can reach a user
     if shutil.which("zenity") or shutil.which("kdialog"):
         return "zenity/kdialog"
     try:
