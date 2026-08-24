@@ -44,18 +44,52 @@ with *"Failed to build spc-spectra"* / `ModuleNotFoundError: No module named
 streamlit run validation_app.py
 ```
 
-Then in the browser:
+The app picks its input mode automatically:
+
+| Where it runs | Input | Output |
+| --- | --- | --- |
+| your own machine | **📁 Folder** — *Browse…* opens the Finder/Explorer folder dialog | written to a folder on disk |
+| a server (Streamlit Cloud, any remote host) | **⬆️ Upload** — select the `.spc` files in the browser | downloaded as a ZIP |
+
+Running locally you get both options and can switch between them; on a server
+only upload is offered, because a server process cannot open a dialog on your
+computer (see [Deploying](#deploying)).
+
+Then:
 
 1. **Raw data folder** — click *Browse…* and pick the folder in the normal
    Finder/Explorer dialog. No typing paths.
+   *(Upload mode: select all the `.spc` files at once.)*
 2. **Output folder** — defaults to `<raw data folder>/output`. Click *Browse…*
    if you want it elsewhere; *Use default* puts it back.
+   *(Upload mode: results come back as **⬇ All results (ZIP)**.)*
 3. Set the analytical wavelength (default 240 nm) and the peak search
    half-width (default ±5 nm).
 4. **Run analysis** — the calibration equation appears at the top of the
    results, with R², LOD and LOQ.
 
-### The folder dialog
+## Deploying
+
+Push the repo and point Streamlit Community Cloud at `validation_app.py` —
+`requirements.txt` is all it needs.
+
+**There is no folder dialog on a hosted app, and there cannot be one.** The app
+process runs in a datacenter, not on your laptop: a dialog it opened would
+appear on the server, and paths it browses are the server's filesystem. Browsers
+deliberately never expose local paths to a page. So the hosted app detects that
+it has no dialog backend and switches to upload mode — the browser's own file
+picker sends the spectra to the server, and the results come back as a ZIP.
+Uploaded files live in a per-session temp folder and go away with the session.
+
+Streamlit Cloud's default upload cap is 200 MB per file; raise it in
+`.streamlit/config.toml` if you ever need to:
+
+```toml
+[server]
+maxUploadSize = 400
+```
+
+### The folder dialog (local runs)
 
 *Browse…* opens the system folder chooser of the machine Streamlit runs on,
 using the first backend that works:
@@ -77,9 +111,10 @@ To check the dialog outside the app:
 python folder_picker.py     # prints the backend, then opens the dialog
 ```
 
-If nothing can open a dialog — typically a headless/remote deployment —
-*Browse…* falls back to an in-app folder browser and shows exactly why each
-backend was skipped. Set `UVVIS_NO_NATIVE_DIALOG=1` to force that fallback.
+If nothing can open a dialog, folder mode is not offered at all and the app
+uses upload mode. Should a dialog fail unexpectedly on a local run, *Browse…*
+falls back to an in-app folder browser and shows exactly why each backend was
+skipped. Set `UVVIS_NO_NATIVE_DIALOG=1` to force upload mode locally.
 
 ## Input file naming
 
@@ -125,8 +160,8 @@ python read_spc.py sample.SPC --plot
 
 | File | Role |
 | --- | --- |
-| `validation_app.py` | Streamlit UI |
-| `folder_picker.py` | native + in-app folder selection widgets |
+| `validation_app.py` | Streamlit UI (folder mode locally, upload mode on a server) |
+| `folder_picker.py` | system folder dialog + in-app fallback browser |
 | `spc_validation.py` | peak picking, repeatability, linear fit, report |
 | `read_spc.py` | Shimadzu `.spc` binary reader (GRAMS fallback) |
 
