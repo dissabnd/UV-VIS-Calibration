@@ -68,53 +68,12 @@ Then:
 4. **Run analysis** — the calibration equation appears at the top of the
    results, with R², LOD and LOQ.
 
-## Deploying
+## Deploying in Streamlit
 
-Push the repo and point Streamlit Community Cloud at `validation_app.py` —
-`requirements.txt` is all it needs.
-
-**There is no folder dialog on a hosted app, and there cannot be one.** The app
-process runs in a datacenter, not on your laptop: a dialog it opened would
-appear on the server, and paths it browses are the server's filesystem. Browsers
-deliberately never expose local paths to a page. So the hosted app detects that
-it has no dialog backend and switches to upload mode — the browser's own file
-picker sends the spectra to the server, and the results come back as a ZIP.
-Uploaded files live in a per-session temp folder and go away with the session.
-
-Streamlit Cloud's default upload cap is 200 MB per file; raise it in
-`.streamlit/config.toml` if you ever need to:
-
-```toml
-[server]
-maxUploadSize = 400
+```
+https://uv-vis-calibration-irrd86awc6hkakegnz6kam.streamlit.app/
 ```
 
-### The folder dialog (local runs)
-
-*Browse…* opens the system folder chooser of the machine Streamlit runs on,
-using the first backend that works:
-
-| Platform | Backend | Needs installing? |
-| --- | --- | --- |
-| macOS | `osascript` (Finder "choose folder") | no — built into macOS |
-| Windows | PowerShell shell folder browser | no |
-| Linux | `zenity` / `kdialog` | `sudo apt install zenity` |
-| any | `tkinter` (last resort) | `brew install python-tk` etc. |
-
-Each runs in its own process, so a dialog can never freeze Streamlit, and on
-macOS it is raised to the front via System Events so it doesn't hide behind the
-browser window.
-
-To check the dialog outside the app:
-
-```bash
-python folder_picker.py     # prints the backend, then opens the dialog
-```
-
-If nothing can open a dialog, folder mode is not offered at all and the app
-uses upload mode. Should a dialog fail unexpectedly on a local run, *Browse…*
-falls back to an in-app folder browser and shows exactly why each backend was
-skipped. Set `UVVIS_NO_NATIVE_DIALOG=1` to force upload mode locally.
 
 ## Input file naming
 
